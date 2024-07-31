@@ -1,0 +1,117 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+struct Contact {
+    string name;
+    string phone;
+    string email;
+};
+
+void addContact(vector<Contact>& contacts) {
+    Contact newContact;
+    cout << "Enter name: ";
+    cin.ignore();
+    getline(cin, newContact.name);
+    cout << "Enter phone number: ";
+    getline(cin, newContact.phone);
+    cout << "Enter email address: ";
+    getline(cin, newContact.email);
+    contacts.push_back(newContact);
+}
+
+void viewContacts(const vector<Contact>& contacts) {
+    for (size_t i = 0; i < contacts.size(); ++i) {
+        cout << "Contact " << i + 1 << ":\n";
+        cout << "Name: " << contacts[i].name << "\n";
+        cout << "Phone: " << contacts[i].phone << "\n";
+        cout << "Email: " << contacts[i].email << "\n";
+        cout << "---------------------------\n";
+    }
+}
+
+void editContact(vector<Contact>& contacts) {
+    int index;
+    cout << "Enter the contact number to edit: ";
+    cin >> index;
+    if (index < 1 || index > contacts.size()) {
+        cout << "Invalid contact number!\n";
+        return;
+    }
+    Contact& contact = contacts[index - 1];
+    cout << "Editing contact " << index << ":\n";
+    cout << "Enter new name (current: " << contact.name << "): ";
+    cin.ignore();
+    getline(cin, contact.name);
+    cout << "Enter new phone number (current: " << contact.phone << "): ";
+    getline(cin, contact.phone);
+    cout << "Enter new email address (current: " << contact.email << "): ";
+    getline(cin, contact.email);
+}
+
+void deleteContact(vector<Contact>& contacts) {
+    int index;
+    cout << "Enter the contact number to delete: ";
+    cin >> index;
+    if (index < 1 || index > contacts.size()) {
+        cout << "Invalid contact number!\n";
+        return;
+    }
+    contacts.erase(contacts.begin() + index - 1);
+}
+
+void saveContacts(const vector<Contact>& contacts) {
+    ofstream file("contacts.txt");
+    for (const Contact& contact : contacts) {
+        file << contact.name << '\n' << contact.phone << '\n' << contact.email << '\n';
+    }
+}
+
+void loadContacts(vector<Contact>& contacts) {
+    ifstream file("contacts.txt");
+    Contact contact;
+    while (getline(file, contact.name) && getline(file, contact.phone) && getline(file, contact.email)) {
+        contacts.push_back(contact);
+    }
+}
+
+int main() {
+    vector<Contact> contacts;
+    loadContacts(contacts);
+    int choice;
+    while (true) {
+        cout << "Contact Management System\n";
+        cout << "1. Add new contact\n";
+        cout << "2. View contacts\n";
+        cout << "3. Edit contact\n";
+        cout << "4. Delete contact\n";
+        cout << "5. Save and exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addContact(contacts);
+                break;
+            case 2:
+                viewContacts(contacts);
+                break;
+            case 3:
+                editContact(contacts);
+                break;
+            case 4:
+                deleteContact(contacts);
+                break;
+            case 5:
+                saveContacts(contacts);
+                cout << "Contacts saved. Exiting...\n";
+                return 0;
+            default:
+                cout << "Invalid choice! Please try again.\n";
+        }
+    }
+    return 0;
+}
